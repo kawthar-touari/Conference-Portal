@@ -1,15 +1,14 @@
 const mongoose = require('mongoose');
 
-async function connectDB() {
+const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI, {
-      dbName: process.env.DB_NAME || 'conference_portal'
-    });
-    console.log('MongoDB connected:', mongoose.connection.name);
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error('MongoDB connection error:', error.message);
-    process.exit(1);
+    console.error(`Error connecting to MongoDB: ${error.message}`);
+    console.log('Server will continue without database connection. Some features may not work.');
+    // Don't exit the process - let the server run without DB
   }
-}
+};
 
 module.exports = connectDB;

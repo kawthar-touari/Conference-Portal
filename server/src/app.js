@@ -1,6 +1,10 @@
+require('dotenv').config();
 const express      = require('express');
 const cors         = require('cors');
+const { protect }  = require('./middleware/auth.middleware');
 const errorHandler = require('./middleware/error.middleware');
+const connectDB = require('./config/db');
+
 
 const app = express();
 app.use(cors());
@@ -19,15 +23,24 @@ app.use('/api', require('./routes/public/certificate.routes'));
 
 // Admin routes
 app.use('/api/admin', require('./routes/admin/auth.routes'));
-app.use('/api/admin', require('./routes/admin/dashboard.routes'));
-app.use('/api/admin', require('./routes/admin/speaker.routes'));
-app.use('/api/admin', require('./routes/admin/session.routes'));
-app.use('/api/admin', require('./routes/admin/submission.routes'));
-app.use('/api/admin', require('./routes/admin/registration.routes'));
-app.use('/api/admin', require('./routes/admin/certificate.routes'));
-app.use('/api/admin', require('./routes/admin/committeeMember.routes'));
+app.use('/api/admin', protect, require('./routes/admin/dashboard.routes'));
+app.use('/api/admin', protect, require('./routes/admin/speaker.routes'));
+app.use('/api/admin', protect, require('./routes/admin/session.routes'));
+app.use('/api/admin', protect, require('./routes/admin/submission.routes'));
+app.use('/api/admin', protect, require('./routes/admin/registration.routes'));
+app.use('/api/admin', protect, require('./routes/admin/certificate.routes'));
+app.use('/api/admin', protect, require('./routes/admin/committeeMember.routes'));
 
 app.get('/api/health', (req, res) => res.json({ message: 'API is running' }));
 app.use(errorHandler);
+
+const PORT = process.env.PORT || 5000;
+
+async function startServer() {
+  await connectDB();
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
+startServer();
 
 module.exports = app;
