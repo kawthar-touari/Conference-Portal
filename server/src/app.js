@@ -22,6 +22,7 @@ app.use('/api', require('./routes/public/register.routes'));
 app.use('/api', require('./routes/public/submission.routes'));
 app.use('/api', require('./routes/public/certificate.routes'));
 app.use('/api', require('./routes/public/report.routes'));
+app.use('/api', require('./routes/public/auth.routes'));
 
 // Admin routes
 app.use('/api/admin', require('./routes/admin/auth.routes'));
