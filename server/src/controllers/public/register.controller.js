@@ -1,33 +1,53 @@
-const { registerParticipant } = require('../../services/registration.service');
 const Conference = require('../../models/conference.model');
+const Participant = require('../../models/participant.model');
+const Registration = require('../../models/registration.model');
 
-async function register(req, res) {
-  try {
-    // Allow registration without an active conference (just create participant account)
-    let conference = null;
-    if (req.body.conferenceId) {
-      conference = await Conference.findById(req.body.conferenceId);
-      if (!conference) {
-        return res.status(404).json({ message: 'Conference not found.' });
-      }
-    } else {
-      // If no conferenceId provided, try to find active conference
-      conference = await Conference.findOne({ isActive: true });
-    }
+async function register (data, conferenceId) {
+  const { fullName, email, password, phone, affiliation, country, participantType } = data;
+  // Find or create participant
+  let participant = await Participant.findOne({ email });
+  let alreadyRegistered = false;
 
-    const result = await registerParticipant(req.body, conference ? conference._id : null);
-    
-    res.json({
-      registrationId: result.registration ? result.registration.registrationId : null,
-      participantId: result.participant._id,
-      alreadyRegistered: result.alreadyRegistered,
-      message: conference 
-        ? (result.alreadyRegistered ? 'Already registered for this conference' : 'Successfully registered for the conference')
-        : 'Account created successfully. You can now register for conferences.'
+  if (!participant) {
+    // Create new participant – password will be hashed by schema pre('save')
+    participant = await Participant.create({
+      fullName,
+      email,
+      password,          // ← MUST be included here
+      phone,
+      affiliation,
+      country,
+      participantType
     });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
   }
+
+  // If a conference ID is provided, handle registration
+  let registration = null;
+  if (conferenceId) {
+    // Check if already registered for this conference
+    const existingReg = await Registration.findOne({
+      conferenceId,
+      participantId: participant._id
+    });
+    
+    if (existingReg) {
+      alreadyRegistered = true;
+      registration = existingReg;
+    } else {
+      registration = await Registration.create({
+        conferenceId,
+        participantId: participant._id,
+        registrationStatus: 'REGISTERED',
+        registeredAt: new Date()
+      });
+    }
+  }
+
+  return {
+    participant,
+    registration,
+    alreadyRegistered
+  };
 }
 
 module.exports = { register };

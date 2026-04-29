@@ -6,7 +6,7 @@ const participantSchema = new mongoose.Schema(
   {
     fullName:        { type: String, required: true, trim: true, maxlength: 150 },
     email:           { type: String, required: true, trim: true, lowercase: true, unique: true, index: true },
-    password:        { type: String, required: true, minlength: 6, select: false },
+    password:        { type: String, required: true, minlength: 6 },
     phone:           { type: String, trim: true, maxlength: 30 },
     affiliation:     { type: String, trim: true, maxlength: 200 },
     country:         { type: String, trim: true, maxlength: 100 },

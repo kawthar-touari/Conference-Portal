@@ -21,7 +21,6 @@ app.use('/api', require('./routes/public/session.routes'));
 app.use('/api', require('./routes/public/register.routes'));
 app.use('/api', require('./routes/public/submission.routes'));
 app.use('/api', require('./routes/public/certificate.routes'));
- code-explanation-and-analysis-994a1
 app.use('/api', require('./routes/public/report.routes'));
 app.use('/api', require('./routes/public/auth.routes'));
 
@@ -39,7 +38,7 @@ app.use('/api/admin', protect, require('./routes/admin/committeeMember.routes'))
 app.get('/api/health', (req, res) => res.json({ message: 'API is running' }));
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT ;
 
 async function startServer() {
   await connectDB();

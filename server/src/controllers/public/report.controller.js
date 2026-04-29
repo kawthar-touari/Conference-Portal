@@ -1,4 +1,4 @@
-const Report = require('../models/report.model');
+const Report = require('../../models/report.model');
 
 // Create a new report (for participants)
 async function createReport(req, res) {
@@ -6,7 +6,7 @@ async function createReport(req, res) {
     const { conferenceId, title, content } = req.body;
     
     // Find participant by email (passed in body or from auth if implemented)
-    const Participant = require('../models/participant.model');
+    const Participant = require('../../models/participant.model');
     const participant = await Participant.findOne({ email: req.body.participantEmail });
     
     if (!participant) {
